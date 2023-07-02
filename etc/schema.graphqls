@@ -1,5 +1,6 @@
 type Query {
-    customerRecommendationLists: [RecommendationList] @doc(description: "Return friend recommendation lists for the customer")
+    customerRecommendationLists: [RecommendationList] @resolver(class: "SwiftOtter\\FriendRecommendations\\Model\\Graphql\\Resolver\\GetCustomerRecommendationLists")
+    @doc(description: "Return friend recommendation lists for the customer")
 }
 
 type RecommendationList {
