@@ -19,7 +19,7 @@ class Sanitizer
     {
         $result = [];
 
-        foreach ($args as $arg) {
+        foreach ($args as $key => $arg) {
             if (is_array($arg)) {
                 $arg = $this->sanitize($arg);
             } else {
@@ -33,7 +33,7 @@ class Sanitizer
             }
 
 
-            $result[] = $arg;
+            $result[$key] = $arg;
         }
 
         return $result;
