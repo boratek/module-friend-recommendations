@@ -9,8 +9,10 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use SwiftOtter\FriendRecommendations\Model\Graphql\Resolver\CreateRecommendationList\Sanitizer;
 use SwiftOtter\FriendRecommendations\Model\Graphql\Resolver\CreateRecommendationList\Validator;
-use SwiftOtter\FriendRecommendations\Model\RecommendationList;
-use SwiftOtter\FriendRecommendations\Model\RecommendationListFactory as Factory;
+use SwiftOtter\FriendRecommendations\Model\RecommendationListProduct;
+
+//use SwiftOtter\FriendRecommendations\Model\RecommendationListFactory as Factory;
+use SwiftOtter\FriendRecommendations\Model\RecommendationListProductFactory as Factory;
 use SwiftOtter\FriendRecommendations\Model\RecommendationListProductRepository as Repository;
 
 class CreateRecommendationList implements ResolverInterface
@@ -22,10 +24,16 @@ class CreateRecommendationList implements ResolverInterface
 
     private Validator $validator;
 
-    public function __construct(Repository $repository, Factory $factory, Sanitizer $sanitizer, Validator $validator)
-    {
+    public function __construct(
+        Repository $repository,
+        Factory $factory,
+        Sanitizer $sanitizer,
+        Validator $validator
+    ) {
         $this->repository = $repository;
-        $this->factory = $factory;
+        $this->factory    = $factory;
+        $this->sanitizer  = $sanitizer;
+        $this->validator  = $validator;
     }
 
     public function resolve(

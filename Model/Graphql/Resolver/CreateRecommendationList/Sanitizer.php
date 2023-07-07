@@ -20,13 +20,18 @@ class Sanitizer
         $result = [];
 
         foreach ($args as $arg) {
-            $matches = [];
-            preg_match('/\$[:]*{(.)*}/', $arg, $matches);
-            if (count($matches) > 0) {
-                $arg = $this->escaper->escapeHtml($this->escaper->escapeJs($arg));
+            if (is_array($arg)) {
+                $arg = $this->sanitize($arg);
             } else {
-                $arg = $this->escaper->escapeHtml($arg);
+                $matches = [];
+                preg_match('/\$[:]*{(.)*}/', $arg, $matches);
+                if (count($matches) > 0) {
+                    $arg = $this->escaper->escapeHtml($this->escaper->escapeJs($arg));
+                } else {
+                    $arg = $this->escaper->escapeHtml($arg);
+                }
             }
+
 
             $result[] = $arg;
         }
