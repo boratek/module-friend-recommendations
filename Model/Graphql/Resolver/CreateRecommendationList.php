@@ -9,31 +9,43 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use SwiftOtter\FriendRecommendations\Model\Graphql\Resolver\CreateRecommendationList\Sanitizer;
 use SwiftOtter\FriendRecommendations\Model\Graphql\Resolver\CreateRecommendationList\Validator;
+use SwiftOtter\FriendRecommendations\Model\RecommendationList;
+use SwiftOtter\FriendRecommendations\Model\RecommendationListFactory as ListFactory;
+use SwiftOtter\FriendRecommendations\Model\RecommendationListRepository as ListRepository;
 use SwiftOtter\FriendRecommendations\Model\RecommendationListProduct;
-
-//use SwiftOtter\FriendRecommendations\Model\RecommendationListFactory as Factory;
-use SwiftOtter\FriendRecommendations\Model\RecommendationListProductFactory as Factory;
-use SwiftOtter\FriendRecommendations\Model\RecommendationListProductRepository as Repository;
+use SwiftOtter\FriendRecommendations\Model\RecommendationListProductFactory as ListProductFactory;
+use SwiftOtter\FriendRecommendations\Model\RecommendationListProductRepository as ListProductRepository;
 
 class CreateRecommendationList implements ResolverInterface
 {
-    private Repository $repository;
-    private Factory $factory;
 
+    private RecommendationList $list;
+    private ListFactory $listFactory;
+    private ListRepository $listRepository;
+    private RecommendationListProduct $listProduct;
+    private ListProductFactory $listProductFactory;
+    private ListProductRepository $listProductRepository;
     private Sanitizer $sanitizer;
-
     private Validator $validator;
 
     public function __construct(
-        Repository $repository,
-        Factory $factory,
+        RecommendationList $list,
+        ListFactory $listFactory,
+        ListRepository $listRepository,
+        RecommendationListProduct $listProduct,
+        ListProductFactory $listProductFactory,
+        ListProductRepository $listProductRepository,
         Sanitizer $sanitizer,
         Validator $validator
     ) {
-        $this->repository = $repository;
-        $this->factory    = $factory;
-        $this->sanitizer  = $sanitizer;
-        $this->validator  = $validator;
+        $this->list                  = $list;
+        $this->listFactory           = $listFactory;
+        $this->listRepository        = $listRepository;
+        $this->listProduct           = $listProduct;
+        $this->listProductFactory    = $listProductFactory;
+        $this->listProductRepository = $listProductRepository;
+        $this->sanitizer             = $sanitizer;
+        $this->validator             = $validator;
     }
 
     public function resolve(
@@ -46,9 +58,21 @@ class CreateRecommendationList implements ResolverInterface
         try {
             $data = $this->sanitize($args);
             $this->validate($data);
-            $recommendation = $this->factory->create();
-            $recommendation->setData($data);
-            $this->repository->save($recommendation);
+            $list = $this->listFactory->create();
+
+            $list->setEmail($data['email']);
+            $list->setFriendName($data['friendName']);
+            $list->setTitle($data['title']);
+            $list->setNote($data['note']);
+            $savedList = $this->listRepository->save($list);
+
+            $listProductsToSave = $data['productSkus'];
+            foreach ($listProductsToSave as $sku) {
+                $listProduct = $this->listProductFactory->create();
+                $listProduct->setListId((int)$savedList->getId());
+                $listProduct->setSku($sku);
+                $this->listProductRepository->save($listProduct);
+            }
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
