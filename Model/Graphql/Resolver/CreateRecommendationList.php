@@ -73,6 +73,13 @@ class CreateRecommendationList implements ResolverInterface
                 $listProduct->setSku($sku);
                 $this->listProductRepository->save($listProduct);
             }
+
+            return [
+                'email' => $data['email'],
+                'friendName' => $data['friendName'],
+                'title' => $data['title'],
+                'note' => $data['note']
+            ];
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
