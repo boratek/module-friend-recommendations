@@ -81,7 +81,12 @@ class CreateRecommendationList implements ResolverInterface
                 'note' => $data['note']
             ];
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            return [
+                'email' => '',
+                'friendName' => '',
+                'title' => 'ERROR',
+                'note' => $e->getMessage()
+            ];
         }
     }
 
